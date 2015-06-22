@@ -5,6 +5,7 @@ class Less2Sass
   Replaces = {
     '@(?!font-face|import|media|keyframes|-)' => '$',
     '\.([\w\-]*)\s*\((.*)\)\s*\{' => "@mixin \\1\(\\2\)\n{",
+    '@include(\W+[.#][^(;]*;)' => '@extend\1',
     '\.([\w\-]*\(.*\)\s*;)' => '@include \1',
     '~"(.*)"' => '#{"\1"}',
     'spin\(' => 'adjust-hue(',

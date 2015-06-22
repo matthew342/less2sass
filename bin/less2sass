@@ -1,3 +1,4 @@
+require 'fileutils'
 #!/usr/bin/env ruby
 
 require_relative '../lib/less2sass'
@@ -6,17 +7,32 @@ if ARGV.size < 1
   puts 'Usage: less2sass inputfile [outputfile]'
 end
 
-input_file = ARGV[0]
-output_file = ARGV[1]
+input_filepath = ARGV[0]
+output_filepath = ARGV[1]
 
-src = File.read input_file
-sass = Less2Sass.convert src
 
-if output_file
-  File.open output_file, 'w' do |file|
-    file << sass
+  files = []
+  if File.directory?(input_filepath)
+    files += Dir["#{input_filepath}/**/*.less"].sort.map { |folder| folder }
+  else
+    files = [input_filepath]
   end
-else
-  puts sass
-end
+
+  files.each do |file|
+    src = File.read file
+    sass = Less2Sass.convert src
+    if output_filepath
+      output_file = File.join(output_filepath, file[input_filepath.size..-1]).gsub(/\.less/, '.css.scss')
+      dirname = File.dirname(output_file)
+      unless File.directory?(dirname)
+        FileUtils.mkdir_p(dirname)
+      end
+      File.open(output_file, 'w+') do |file|
+       file << sass
+      end
+    else
+      puts sass
+    end
+  end
+
 
